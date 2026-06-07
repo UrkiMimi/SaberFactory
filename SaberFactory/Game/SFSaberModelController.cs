@@ -8,7 +8,7 @@ using SaberFactory.Misc;
 using SaberFactory.Models;
 using SiraUtil.Interfaces;
 using SiraUtil.Logging;
-using SiraUtil.Tools;
+using SiraUtil.Sabers;
 using UnityEngine;
 using Zenject;
 
@@ -38,7 +38,7 @@ namespace SaberFactory.Game
             set => SetColor(value);
         }
 
-        public override async void Init(Transform parent, Saber saber)
+        public async void CustomInit(Transform parent, Saber saber)
         {
             await _gameSaberSetup.SetupTask;
 
