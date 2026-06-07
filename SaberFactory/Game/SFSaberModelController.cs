@@ -1,4 +1,7 @@
-﻿using HarmonyLib;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using HarmonyLib;
 using IPA.Utilities;
 using SaberFactory.Helpers;
 using SaberFactory.Instances;
@@ -6,12 +9,10 @@ using SaberFactory.Misc;
 using SaberFactory.Models;
 using SiraUtil.Interfaces;
 using SiraUtil.Logging;
-using SiraUtil.Sabers;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using SiraUtil.Tools;
 using UnityEngine;
 using Zenject;
+
 
 namespace SaberFactory.Game
 {

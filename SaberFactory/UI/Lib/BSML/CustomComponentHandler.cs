@@ -18,7 +18,6 @@ using SaberFactory.UI.Lib.BSML.Tags;
 using SiraUtil.Logging;
 using UnityEngine;
 using Zenject;
-using Debug = UnityEngine.Debug;
 
 namespace SaberFactory.UI.Lib.BSML
 {
@@ -37,12 +36,16 @@ namespace SaberFactory.UI.Lib.BSML
             _logger = logger;
             _popupFactory = popupFactory;
             _customUiComponentFactory = customUiComponentFactory;
-            _bsmlParser = BSMLParser.instance;
-            RegisterAll(BSMLParser.instance);
+            _bsmlParser = BSMLParser.Instance;
+            RegisterAll(BSMLParser.Instance);
         }
 
         public void Initialize()
-        { }
+        {
+            Registered = false;
+            RegisterAll(BSMLParser.Instance);
+
+        }
 
         private void RegisterAll(BSMLParser parser)
         {
@@ -76,7 +79,7 @@ namespace SaberFactory.UI.Lib.BSML
 
             Registered = true;
         }
-        
+
         [Conditional("DEBUG")]
         private void DocCustoms(BSMLParser parser)
         {
@@ -84,7 +87,7 @@ namespace SaberFactory.UI.Lib.BSML
             var tags = parser.GetField<Dictionary<string, BSMLTag>, BSMLParser>("tags");
             var typeHandlers = parser.GetField<List<TypeHandler>, BSMLParser>("typeHandlers");
 
-            var additionalCssProps = new HashSet<string>{"style"};
+            var additionalCssProps = new HashSet<string> { "style" };
 
             var cssDataObject = new JObject();
             cssDataObject.Add("version", 1.1);
@@ -95,6 +98,8 @@ namespace SaberFactory.UI.Lib.BSML
             var schema = XmlSchema.Read(XmlReader.Create(new StringReader(schemaTemplate)), (sender, args) => { });
 
             var attrDict = new Dictionary<string, XmlSchemaAttribute>();
+
+            var parent = new GameObject("SaberFactory CustomComponentHandler").transform;
 
             foreach (var item in schema.Items)
             {
@@ -109,7 +114,7 @@ namespace SaberFactory.UI.Lib.BSML
 
                         additionalCssProps.Add(attribute.Name);
                     }
-                    
+
                     complexType.Attributes.Add(new XmlSchemaAttribute { Name = "style" });
 
                     var tag = tags.Values.FirstOrDefault(x => x.GetType().Name == complexType.Name);
@@ -117,22 +122,22 @@ namespace SaberFactory.UI.Lib.BSML
                     {
                         try
                         {
-                            var node = tag.CreateObject(parser.transform);
+                            var node = tag.CreateObject(parent);
                             foreach (var typeHandler in typeHandlers.Where(x => x.GetType().Assembly == thisAsm))
                             {
-                                var type = typeHandler.GetType().GetCustomAttribute<ComponentHandler>().type;
+                                var type = typeHandler.GetType().GetCustomAttribute<ComponentHandler>().Type;
                                 if (parser.InvokeMethod<Component, BSMLParser>("GetExternalComponent", node, type) != null)
                                 {
                                     foreach (var attrAliases in typeHandler.Props.Values)
                                     {
                                         foreach (var attrAlias in attrAliases)
                                         {
-                                            Debug.Log($"Adding {attrAlias} to existing type {complexType.Name}");
+                                            _logger.Info($"Adding {attrAlias} to existing type {complexType.Name}");
                                             complexType.Attributes.Add(new XmlSchemaAttribute
                                             {
                                                 Name = attrAlias
                                             });
-                                            
+
                                             additionalCssProps.Add(attrAlias);
                                         }
                                     }
@@ -159,15 +164,15 @@ namespace SaberFactory.UI.Lib.BSML
                 {
                     Name = tagType.Name
                 };
-                
+
                 complexType.Attributes.Add(new XmlSchemaAttribute { Name = "style" });
 
                 try
                 {
-                    var currentNode = tag.CreateObject(parser.transform);
+                    var currentNode = tag.CreateObject(parent);
                     foreach (var typeHandler in typeHandlers)
                     {
-                        var type = typeHandler.GetType().GetCustomAttribute<ComponentHandler>().type;
+                        var type = typeHandler.GetType().GetCustomAttribute<ComponentHandler>().Type;
                         if (parser.InvokeMethod<Component, BSMLParser>("GetExternalComponent", currentNode, type) != null)
                         {
                             foreach (var attrAliases in typeHandler.Props.Values)
@@ -191,8 +196,8 @@ namespace SaberFactory.UI.Lib.BSML
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError($"Couldn't instantiate {tag.Aliases[0]}");
-                    Debug.LogWarning(e);
+                    _logger.Error($"Couldn't instantiate {tag.Aliases[0]}");
+                    _logger.Warn(e);
                 }
 
                 foreach (var alias in tag.Aliases)
@@ -214,8 +219,8 @@ namespace SaberFactory.UI.Lib.BSML
             schema.Write(writer);
             File.WriteAllText("CustomBSMLSchema.xsd", writer.ToString());
             File.WriteAllText("css.css-data.json", cssDataObject.ToString());
-            
-            Debug.LogWarning("Written new doc");
+
+            _logger.Warn("Written new doc");
         }
 
         private class Utf8Writer : StringWriter

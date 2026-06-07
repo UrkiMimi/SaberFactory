@@ -61,10 +61,10 @@ namespace SaberFactory.Game
                 return;
             }
 
-            if (!_config.OverrideSongSaber)
-            {
-                await SetupSongSaber();
-            }
+            
+            
+                
+            
         }
 
         private async Task RandomSaber()

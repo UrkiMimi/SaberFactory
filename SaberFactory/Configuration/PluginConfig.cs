@@ -22,9 +22,6 @@ namespace SaberFactory.Configuration
         // Enable saber events
         public bool EnableEvents { get; set; } = true;
 
-        // Use your own saber instead of the one dictated by the song
-        public bool OverrideSongSaber { get; set; } = false;
-
         // Randomize saber on each song start
         public bool RandomSaber { get; set; } = false;
 
@@ -67,12 +64,6 @@ namespace SaberFactory.Configuration
 
         // Automatically reload the saber when the file changes (saber needs to be selected)
         public bool ReloadOnSaberUpdate { get; set; } = false;
-
-        // Volume of the saber swing sound (saber needs to implement it)
-        public float SwingSoundVolume { get; set; } = 1;
-
-        // Allow the custom burnmarks feature (saber needs to implement it)
-        public bool EnableCustomBurnmarks { get; set; } = true;
 
         // How many threads to spawn when loading all sabers
         // ! Not used as of right now !
