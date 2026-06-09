@@ -22,7 +22,7 @@
                     preferred-height='15'
                     on-click='profile-clicked'
                     icon='SaberFactory.Resources.Icons.profile.png'
-                    hover-hint='Support me on Ko-Fi'
+                    hover-hint='Original Author ToniMacaroni'
                     skew='0' show-line='false' normal-color='#00000000' hovered-color='#00b6ff40' use-gradient='false'/>
             <sui.icon-button
                     pad='1'
@@ -30,7 +30,7 @@
                     preferred-height='15'
                     on-click='discord-clicked'
                     icon='SaberFactory.Resources.Icons.discord.png'
-                    hover-hint='Join our lovely server for help with the mod'
+                    hover-hint='Original Saber Factory Github'
                     skew='0' show-line='false' normal-color='#00000000' hovered-color='#00b6ff40' use-gradient='false'/>
             <sui.icon-button
                     id='github-button'

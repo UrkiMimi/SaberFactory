@@ -14,8 +14,8 @@ namespace SaberFactory.UI.CustomSaber.Views
 {
     internal class SettingsView : SubView, INavigationCategoryView
     {
-        private const string ProfileUrl = "https://ko-fi.com/tonimacaroni";
-        private const string DiscordUrl = "https://discord.gg/PjD7WcChH3";
+        private const string ProfileUrl = "https://github.com/ToniMacaroni";
+        private const string DiscordUrl = "https://github.com/ToniMacaroni/SaberFactory";
 
         [UIComponent("changelog-popup")] private readonly ChangelogPopup _changelogPopup = null;
         [UIObject("github-button")] private readonly GameObject _githubButton = null;
