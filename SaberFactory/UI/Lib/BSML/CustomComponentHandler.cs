@@ -43,9 +43,6 @@ namespace SaberFactory.UI.Lib.BSML
 
         public void Initialize()
         {
-            
-            Registered = false;
-            RegisterAll(BSMLParser.Instance);
         }
 
         private void RegisterAll(BSMLParser parser)
