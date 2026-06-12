@@ -38,6 +38,7 @@ namespace SaberFactory.DataStore
         private MainAssetStore(
             PluginConfig config,
             SiraLog logger,
+             
             CustomSaberModelLoader customSaberModelLoader,
             PluginDirectories pluginDirs)
         {

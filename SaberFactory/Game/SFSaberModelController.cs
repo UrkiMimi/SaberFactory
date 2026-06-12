@@ -9,14 +9,13 @@ using SaberFactory.Misc;
 using SaberFactory.Models;
 using SiraUtil.Interfaces;
 using SiraUtil.Logging;
-using SiraUtil.Tools;
+using SiraUtil.Sabers;
 using UnityEngine;
 using Zenject;
 
-
 namespace SaberFactory.Game
 {
-    internal class SfSaberModelController : SaberModelController, IColorable
+    internal class SfSaberModelController : SaberModelController, IColorable, IPreSaberModelInit
     {
         [InjectOptional] private readonly EventPlayer _eventPlayer = null;
         [Inject] private readonly GameSaberSetup _gameSaberSetup = null;
@@ -31,7 +30,7 @@ namespace SaberFactory.Game
         public void SetColor(Color color)
         {
             _saberColor = color;
-            _saberInstance.SetColor(color);
+            _saberInstance?.SetColor(color);
         }
 
         public Color Color
@@ -39,12 +38,14 @@ namespace SaberFactory.Game
             get => _saberColor.GetValueOrDefault();
             set => SetColor(value);
         }
+
         public bool PreInit(Transform parent, Saber saber)
         {
-            CustomInit(parent, saber);
+            InitAsync(parent, saber);
             return false;
         }
-        public async void CustomInit(Transform parent, Saber saber)
+
+        private async void InitAsync(Transform parent, Saber saber)
         {
             await _gameSaberSetup.SetupTask;
 
@@ -53,8 +54,12 @@ namespace SaberFactory.Game
             var saberModel = saber.saberType == SaberType.SaberA ? _saberSet.LeftSaber : _saberSet.RightSaber;
 
             _saberInstance = _saberInstanceFactory.Create(saberModel);
+
+            
+            _saberInstance.SetParent(transform);
             var saberTrail = this.GetField<SaberTrail, SaberModelController>("_saberTrail");
             var colorManager = this.GetField<ColorManager, SaberModelController>("_colorManager");
+            _saberInstance.CreateTrail(false, saberTrail);
             SetColor(_saberColor ?? colorManager.ColorForSaberType(_saberInstance.Model.SaberSlot.ToSaberType()));
 
             _eventPlayer?.SetPartEventList(_saberInstance.Events, saber.saberType);

@@ -17,12 +17,35 @@ namespace SaberFactory.UI.Lib.BSML.Tags
     {
         public override string[] Aliases => new[] { CustomComponentHandler.ComponentPrefix + ".scroll-view" };
 
+        private static TextPageScrollView _textPageScrollViewTemplate;
+        private static IVRPlatformHelper _platformHelper;
+
         public override GameObject CreateObject(Transform parent)
         {
-            var textScrollView =
-                Object.Instantiate(
-                    Resources.FindObjectsOfTypeAll<PrivacyPolicyViewController>().First()
-                        .GetField<TextPageScrollView, PrivacyPolicyViewController>("_textPageScrollView"), parent);
+            if (_textPageScrollViewTemplate == null)
+            {
+                _textPageScrollViewTemplate = Resources.FindObjectsOfTypeAll<TextPageScrollView>().FirstOrDefault(x => x.name == "TextPageScrollView");
+            }
+
+            if (_platformHelper == null)
+            {
+                foreach (var sv in Resources.FindObjectsOfTypeAll<ScrollView>())
+                {
+                    var helper = sv.GetField<IVRPlatformHelper, ScrollView>("_platformHelper");
+                    if (helper != null)
+                    {
+                        _platformHelper = helper;
+                        break;
+                    }
+                }
+            }
+
+            if (_textPageScrollViewTemplate == null)
+            {
+                return new GameObject("CustomScrollView_Fallback");
+            }
+
+            var textScrollView = Object.Instantiate(_textPageScrollViewTemplate, parent);
             textScrollView.name = "BSMLScrollView";
             var pageUpButton = textScrollView.GetField<Button, ScrollView>("_pageUpButton");
             var pageDownButton = textScrollView.GetField<Button, ScrollView>("_pageDownButton");
@@ -37,6 +60,10 @@ namespace SaberFactory.UI.Lib.BSML.Tags
             gameObject.SetActive(false);
 
             var scrollView = gameObject.AddComponent<BSMLScrollView>();
+            if (_platformHelper != null)
+            {
+                scrollView.SetField<ScrollView, IVRPlatformHelper>("_platformHelper", _platformHelper);
+            }
             scrollView.SetField<ScrollView, Button>("_pageUpButton", pageUpButton);
             scrollView.SetField<ScrollView, Button>("_pageDownButton", pageDownButton);
             scrollView.SetField<ScrollView, VerticalScrollIndicator>("_verticalScrollIndicator", verticalScrollIndicator);
@@ -63,7 +90,8 @@ namespace SaberFactory.UI.Lib.BSML.Tags
             var rectTransform = parentObj.transform.AsRectTransform();
 
             parentObj.AddComponent<LayoutElement>();
-            parentObj.AddComponent<ScrollViewContent>().ScrollView = scrollView;
+            var scrollViewContent = parentObj.AddComponent<ScrollViewContent>();
+            scrollViewContent.ScrollView = scrollView;
 
             var child = new GameObject();
             child.name = "BSMLScrollViewContentContainer";
@@ -72,7 +100,9 @@ namespace SaberFactory.UI.Lib.BSML.Tags
             var layoutGroup = child.AddComponent<VerticalLayoutGroup>();
             layoutGroup.childControlHeight = false;
             layoutGroup.childForceExpandHeight = false;
-            layoutGroup.childAlignment = TextAnchor.LowerCenter;
+            layoutGroup.childControlWidth = true;
+            layoutGroup.childForceExpandWidth = true;
+            layoutGroup.childAlignment = TextAnchor.UpperCenter;
             layoutGroup.spacing = 0.5f;
 
             parentObj.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
@@ -82,16 +112,27 @@ namespace SaberFactory.UI.Lib.BSML.Tags
             externalComponents.Components.Add(scrollView);
             externalComponents.Components.Add(scrollView.transform);
 
-            child.transform.AsRectTransform().sizeDelta = new Vector2(0, -1);
+            var childRect = child.transform.AsRectTransform();
+            childRect.anchorMin = new Vector2(0, 1);
+            childRect.anchorMax = new Vector2(1, 1);
+            childRect.pivot = new Vector2(0.5f, 1);
+            childRect.sizeDelta = new Vector2(0, 0);
+
+            var rootRect = gameObject.transform.AsRectTransform();
+            rootRect.anchorMin = new Vector2(0, 0);
+            rootRect.anchorMax = new Vector2(1, 1);
+            rootRect.sizeDelta = new Vector2(-4, -4);
+            rootRect.anchoredPosition = new Vector2(0, 0);
 
             scrollView.SetField<ScrollView, RectTransform>("_contentRectTransform", parentObj.transform as RectTransform);
 
-            BeatSaberUI.DiContainer.Resolve<ICoroutineStarter>().StartCoroutine(Man(gameObject, rectTransform));
+            var runner = new GameObject("SF_ScrollViewRunner");
+            runner.AddComponent<CoroutineStarter>().Run(SetupScrollView(gameObject, rectTransform, runner));
 
             return child;
         }
 
-        private IEnumerator Man(GameObject gameObject, RectTransform rectTransform)
+        private IEnumerator SetupScrollView(GameObject gameObject, RectTransform rectTransform, GameObject runner)
         {
             gameObject.SetActive(true);
             yield return new WaitForEndOfFrame();
@@ -100,6 +141,15 @@ namespace SaberFactory.UI.Lib.BSML.Tags
             rectTransform.anchorMax = new Vector2(1, 1);
             rectTransform.sizeDelta = new Vector2(0, 0);
             rectTransform.pivot = new Vector2(0.5f, 1);
+            Object.Destroy(runner);
+        }
+
+        private class CoroutineStarter : MonoBehaviour
+        {
+            public void Run(IEnumerator routine)
+            {
+                StartCoroutine(routine);
+            }
         }
     }
 }

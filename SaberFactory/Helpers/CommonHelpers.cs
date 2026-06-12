@@ -91,20 +91,31 @@ namespace SaberFactory.Helpers
 
             var gameObject = monoBehaviour.gameObject;
             var upgradedDummyComponent = Activator.CreateInstance(upgradingType);
-            foreach (FieldInfo info in originalType.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic))
+
+            
+            for (var type = originalType; type != null && type != typeof(MonoBehaviour); type = type.BaseType)
             {
-                info.SetValue(upgradedDummyComponent, info.GetValue(monoBehaviour));
+                foreach (FieldInfo info in type.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
+                {
+                    info.SetValue(upgradedDummyComponent, info.GetValue(monoBehaviour));
+                }
             }
+
             UnityEngine.Object.DestroyImmediate(monoBehaviour);
             bool goState = gameObject.activeSelf;
             gameObject.SetActive(false);
             var upgradedMonoBehaviour = gameObject.AddComponent(upgradingType);
-            foreach (FieldInfo info in upgradingType.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic))
+
+            for (var type = upgradingType; type != null && type != typeof(MonoBehaviour); type = type.BaseType)
             {
-                info.SetValue(upgradedMonoBehaviour, info.GetValue(upgradedDummyComponent));
+                foreach (FieldInfo info in type.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
+                {
+                    info.SetValue(upgradedMonoBehaviour, info.GetValue(upgradedDummyComponent));
+                }
             }
+
             gameObject.SetActive(goState);
             return upgradedMonoBehaviour;
         }
     }
-}
+} 

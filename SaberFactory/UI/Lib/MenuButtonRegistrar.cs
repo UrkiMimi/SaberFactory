@@ -16,7 +16,10 @@ namespace SaberFactory.UI.Lib
 
         public void Dispose()
         {
-            MenuButtons.Instance.UnregisterButton(_menuButton);
+            if ((MenuButtons.Instance != null) && (BSMLParser.Instance != null))
+            {
+                MenuButtons.Instance.UnregisterButton(_menuButton);
+            }
         }
 
         public void Initialize()

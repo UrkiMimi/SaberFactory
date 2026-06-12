@@ -18,6 +18,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 
+
 namespace SaberFactory.UI.CustomSaber.Views
 {
     internal class TrailSettingsView : SubView, INavigationCategoryView
@@ -138,19 +139,19 @@ namespace SaberFactory.UI.CustomSaber.Views
 
             _editorInstanceManager.OnSaberInstanceCreated += CreateTrail;
 
-           // if (_instanceTrailData != null && _pluginConfig.ControlTrailWithThumbstick)
-           // {
-           //     _trailFloatLength = _instanceTrailData.Length;
-           //     _vrPlatformHelper.joystickWasNotCenteredThisFrameEvent += OnjoystickWasNotCenteredThisFrameEvent;
-           // }
+            if (_instanceTrailData != null && _pluginConfig.ControlTrailWithThumbstick)
+            {
+                _trailFloatLength = _instanceTrailData.Length;
+               // _vrPlatformHelper.joystickWasNotCenteredThisFrameEvent += OnjoystickWasNotCenteredThisFrameEvent;
+            }
         }
 
         public override void DidClose()
         {
-           // if (_instanceTrailData != null && _pluginConfig.ControlTrailWithThumbstick)
-           // {
-           //     _vrPlatformHelper.joystickWasNotCenteredThisFrameEvent -= OnjoystickWasNotCenteredThisFrameEvent;
-           // }
+            if (_instanceTrailData != null && _pluginConfig.ControlTrailWithThumbstick)
+            {
+                // _vrPlatformHelper.joystickWasNotCenteredThisFrameEvent -= OnjoystickWasNotCenteredThisFrameEvent;
+            }
 
             _editorInstanceManager.OnSaberInstanceCreated -= CreateTrail;
 

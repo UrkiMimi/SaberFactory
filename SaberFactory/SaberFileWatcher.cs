@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.IO;
+using System.Threading.Tasks;
+using IPA.Utilities.Async;
 using UnityEngine;
 
 namespace SaberFactory
@@ -11,14 +13,12 @@ namespace SaberFactory
 
         public bool IsWatching { get; private set; }
         private readonly DirectoryInfo _dir;
-        private readonly ICoroutineStarter _coroutineStarter;
 
         private FileSystemWatcher _watcher;
 
-        public SaberFileWatcher(PluginDirectories dirs, ICoroutineStarter coroutineStarter)
+        public SaberFileWatcher(PluginDirectories dirs)
         {
             _dir = dirs.CustomSaberDir;
-            _coroutineStarter = coroutineStarter;
         }
 
         public event Action<string> OnSaberUpdate;
@@ -44,7 +44,22 @@ namespace SaberFactory
 
         private void WatcherOnCreated(object sender, FileSystemEventArgs e)
         {
-            _coroutineStarter.StartCoroutine(Initiate(e.FullPath));
+            _ = Task.Factory.StartNew(async () =>
+            {
+                var seconds = 0f;
+                while (seconds < 10)
+                {
+                    if (File.Exists(e.FullPath))
+                    {
+                        await Task.Delay(500);
+                        OnSaberUpdate?.Invoke(e.FullPath);
+                        return;
+                    }
+
+                    await Task.Delay(500);
+                    seconds += 0.5f;
+                }
+            }, System.Threading.CancellationToken.None, TaskCreationOptions.None, UnityMainThreadTaskScheduler.Default);
         }
 
         private IEnumerator Initiate(string filename)
