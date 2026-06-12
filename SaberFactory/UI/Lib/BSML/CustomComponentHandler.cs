@@ -26,7 +26,7 @@ namespace SaberFactory.UI.Lib.BSML
     {
         public const string ComponentPrefix = "sui";
 
-        public static bool Registered { get; private set; }
+        
         private readonly SiraLog _logger;
 
         private CustomComponentHandler(
@@ -42,16 +42,11 @@ namespace SaberFactory.UI.Lib.BSML
         }
 
         public void Initialize()
-        {
-        }
+        { }
 
         private void RegisterAll(BSMLParser parser)
         {
-            if (Registered)
-            {
-                return;
-            }
-
+            
             foreach (var tag in InstantiateOfType<BSMLTag>())
             {
                 parser.RegisterTag(tag);
@@ -75,7 +70,7 @@ namespace SaberFactory.UI.Lib.BSML
 
             _logger.Info("Registered Custom Components");
 
-            Registered = true;
+            
         }
 
         [Conditional("DEBUG")]
