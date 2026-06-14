@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using HarmonyLib;
 using IPA.Utilities;
+using SaberFactory.Configuration;
 using SaberFactory.Helpers;
 using SaberFactory.Instances;
 using SaberFactory.Misc;
@@ -22,7 +23,7 @@ namespace SaberFactory.Game
         [Inject] private readonly SiraLog _logger = null;
         [Inject] private readonly SaberInstance.Factory _saberInstanceFactory = null;
         [Inject] private readonly SaberSet _saberSet = null;
-        
+        [Inject] private readonly PluginConfig _pluginConfig = null;
         private Color? _saberColor;
 
         private SaberInstance _saberInstance;
@@ -41,12 +42,13 @@ namespace SaberFactory.Game
 
         public bool PreInit(Transform parent, Saber saber)
         {
-            InitAsync(parent, saber);
+            CustomInit(parent, saber);
             return false;
         }
 
-        private async void InitAsync(Transform parent, Saber saber)
+        public async void CustomInit(Transform parent, Saber saber)
         {
+
             await _gameSaberSetup.SetupTask;
 
             transform.SetParent(parent, false);
@@ -55,7 +57,6 @@ namespace SaberFactory.Game
 
             _saberInstance = _saberInstanceFactory.Create(saberModel);
 
-            
             _saberInstance.SetParent(transform);
             var saberTrail = this.GetField<SaberTrail, SaberModelController>("_saberTrail");
             var colorManager = this.GetField<ColorManager, SaberModelController>("_colorManager");

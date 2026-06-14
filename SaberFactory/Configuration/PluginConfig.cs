@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using IPA.Config.Stores;
 using IPA.Config.Stores.Attributes;
@@ -11,7 +10,7 @@ using UnityEngine;
 
 namespace SaberFactory.Configuration
 {
-    internal class PluginConfig : INotifyPropertyChanged
+    internal class PluginConfig 
     {
         public bool Enabled { get; set; } = true;
 
@@ -111,12 +110,6 @@ namespace SaberFactory.Configuration
             return Favorites.Contains(path);
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+        
     }
 }
