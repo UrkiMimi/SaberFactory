@@ -111,15 +111,6 @@ namespace SaberFactory.Helpers
             return new Tuple<T, AssetBundle>(asset, assetBundle);
         }
 
-        //public static async Task<Tuple<T, AssetBundle>> LoadAssetFromAssetBundleAsync<T>(string path,
-        //    string assetName) where T : UnityEngine.Object
-        //{
-        //    var fileData = await ReadFileAsync(path);
-        //    if (fileData == null) return null;
-        //    var asset = await LoadAssetFromAssetBundleAsync<T>(fileData, assetName);
-        //    return asset;
-        //}
-
         public static async Task<Tuple<T, AssetBundle>> LoadAssetFromAssetBundleAsync<T>(string path, string assetName) where T : Object
         {
             var tcs = new TaskCompletionSource<Tuple<T, AssetBundle>>();

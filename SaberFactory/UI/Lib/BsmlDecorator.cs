@@ -17,7 +17,7 @@ namespace SaberFactory.UI.Lib
     internal class BsmlDecorator
     {
         [Inject] public readonly StyleSheetHandler StyleSheetHandler = null;
-        
+
         private readonly Dictionary<string, Func<BsmlDecorator, string[], string>> _templateHandlers =
             new Dictionary<string, Func<BsmlDecorator, string[], string>>
             {
@@ -36,7 +36,7 @@ namespace SaberFactory.UI.Lib
 
         private readonly Dictionary<string, string> _templates = new Dictionary<string, string>();
 
-        private readonly Dictionary<string, XmlNode> _bsmlCache = new Dictionary<string, XmlNode>();
+        private readonly Dictionary<string, string> _bsmlCache = new Dictionary<string, string>();
         private readonly XmlReaderSettings _readerSettings = new XmlReaderSettings { IgnoreComments = true };
 
         public void AddTemplateHandler(string name, Func<BsmlDecorator, string[], string> action)
@@ -63,7 +63,7 @@ namespace SaberFactory.UI.Lib
 
         public async Task<BSMLParserParams> ParseFromResourceAsync(string resourceName, GameObject parent, object host)
         {
-            if (!_bsmlCache.TryGetValue(resourceName, out var node))
+            if (!_bsmlCache.TryGetValue(resourceName, out var cachedContent))
             {
                 var data = await Readers.ReadResourceAsync(resourceName);
                 var content = Readers.BytesToString(data);
@@ -71,16 +71,16 @@ namespace SaberFactory.UI.Lib
                 var doc = new XmlDocument();
                 doc.Load(XmlReader.Create(new StringReader(content), _readerSettings));
                 ProcessDoc(doc);
-                node = doc;
-                _bsmlCache.Add(resourceName, node);
+                cachedContent = doc.OuterXml;
+                _bsmlCache.Add(resourceName, cachedContent);
             }
 
-            return BSMLParser.instance.Parse(node, parent, host);
+            return BSMLParser.Instance.Parse(cachedContent, parent, host);
         }
 
         public BSMLParserParams ParseFromResource(string resourceName, GameObject parent, object host)
         {
-            if (!_bsmlCache.TryGetValue(resourceName, out var node))
+            if (!_bsmlCache.TryGetValue(resourceName, out var cachedContent))
             {
                 var data = Readers.ReadResource(resourceName);
                 var content = Readers.BytesToString(data);
@@ -88,23 +88,23 @@ namespace SaberFactory.UI.Lib
                 var doc = new XmlDocument();
                 doc.Load(XmlReader.Create(new StringReader(content), _readerSettings));
                 ProcessDoc(doc);
-                node = doc;
-                _bsmlCache.Add(resourceName, node);
+                cachedContent = doc.OuterXml;
+                _bsmlCache.Add(resourceName, cachedContent);
             }
 
-            return BSMLParser.instance.Parse(node, parent, host);
+            return BSMLParser.Instance.Parse(cachedContent, parent, host);
         }
 
         public BSMLParserParams ParseFromString(string content, GameObject parent, object host)
         {
             content = Process(content);
-            return BSMLParser.instance.Parse(content, parent, host);
+            return BSMLParser.Instance.Parse(content, parent, host);
         }
-        
+
         public void ProcessDoc(XmlDocument doc)
         {
             var vars = new Dictionary<string, string>();
-            
+
             ProcessNode(doc, vars);
         }
 
@@ -123,7 +123,7 @@ namespace SaberFactory.UI.Lib
                         node.SetAttribute(rule.Name, rule.Value);
                     }
                 }
-                
+
                 ProcessNode(node, vars);
             }
         }

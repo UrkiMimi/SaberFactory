@@ -2,26 +2,28 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using HarmonyLib;
+using IPA.Utilities;
+using SaberFactory.Configuration;
 using SaberFactory.Helpers;
 using SaberFactory.Instances;
 using SaberFactory.Misc;
 using SaberFactory.Models;
 using SiraUtil.Interfaces;
 using SiraUtil.Logging;
-using SiraUtil.Tools;
+using SiraUtil.Sabers;
 using UnityEngine;
 using Zenject;
 
 namespace SaberFactory.Game
 {
-    internal class SfSaberModelController : SaberModelController, IColorable
+    internal class SfSaberModelController : SaberModelController, IColorable, IPreSaberModelInit
     {
         [InjectOptional] private readonly EventPlayer _eventPlayer = null;
         [Inject] private readonly GameSaberSetup _gameSaberSetup = null;
         [Inject] private readonly SiraLog _logger = null;
         [Inject] private readonly SaberInstance.Factory _saberInstanceFactory = null;
         [Inject] private readonly SaberSet _saberSet = null;
-        [Inject] private readonly List<ICustomizer> _customizers = null;
+        [Inject] private readonly PluginConfig _pluginConfig = null;
         private Color? _saberColor;
 
         private SaberInstance _saberInstance;
@@ -29,7 +31,7 @@ namespace SaberFactory.Game
         public void SetColor(Color color)
         {
             _saberColor = color;
-            _saberInstance.SetColor(color);
+            _saberInstance?.SetColor(color);
         }
 
         public Color Color
@@ -38,8 +40,15 @@ namespace SaberFactory.Game
             set => SetColor(value);
         }
 
-        public override async void Init(Transform parent, Saber saber)
+        public bool PreInit(Transform parent, Saber saber)
         {
+            CustomInit(parent, saber);
+            return false;
+        }
+
+        public async void CustomInit(Transform parent, Saber saber)
+        {
+
             await _gameSaberSetup.SetupTask;
 
             transform.SetParent(parent, false);
@@ -48,14 +57,11 @@ namespace SaberFactory.Game
 
             _saberInstance = _saberInstanceFactory.Create(saberModel);
 
-            if (saber.saberType == SaberType.SaberA)
-            {
-                _customizers.Do(x=>x.SetSaber(_saberInstance));
-            }
-
             _saberInstance.SetParent(transform);
-            _saberInstance.CreateTrail(false, _saberTrail);
-            SetColor(_saberColor ?? _colorManager.ColorForSaberType(_saberInstance.Model.SaberSlot.ToSaberType()));
+            var saberTrail = this.GetField<SaberTrail, SaberModelController>("_saberTrail");
+            var colorManager = this.GetField<ColorManager, SaberModelController>("_colorManager");
+            _saberInstance.CreateTrail(false, saberTrail);
+            SetColor(_saberColor ?? colorManager.ColorForSaberType(_saberInstance.Model.SaberSlot.ToSaberType()));
 
             _eventPlayer?.SetPartEventList(_saberInstance.Events, saber.saberType);
 

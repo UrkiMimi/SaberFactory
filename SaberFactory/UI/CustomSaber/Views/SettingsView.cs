@@ -14,8 +14,8 @@ namespace SaberFactory.UI.CustomSaber.Views
 {
     internal class SettingsView : SubView, INavigationCategoryView
     {
-        private const string ProfileUrl = "https://ko-fi.com/tonimacaroni";
-        private const string DiscordUrl = "https://discord.gg/PjD7WcChH3";
+        private const string ProfileUrl = "https://github.com/ToniMacaroni";
+        private const string DiscordUrl = "https://github.com/ToniMacaroni/SaberFactory";
 
         [UIComponent("changelog-popup")] private readonly ChangelogPopup _changelogPopup = null;
         [UIObject("github-button")] private readonly GameObject _githubButton = null;
@@ -53,40 +53,6 @@ namespace SaberFactory.UI.CustomSaber.Views
             }
         }
 
-        [UIValue("override-song-saber")]
-        private bool OverrideSongSaber
-        {
-            get => _pluginConfig.OverrideSongSaber;
-            set
-            {
-                _pluginConfig.OverrideSongSaber = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private float SwingSoundVolume
-        {
-            get => _pluginConfig.SwingSoundVolume;
-            set
-            {
-                _pluginConfig.SwingSoundVolume = value;
-                if (_saberSound)
-                {
-                    _saberSound.ConfigVolume = value;
-                }
-                OnPropertyChanged();
-            }
-        }
-
-        private bool EnableCustomBurnmarks
-        {
-            get => _pluginConfig.EnableCustomBurnmarks;
-            set
-            {
-                _pluginConfig.EnableCustomBurnmarks = value;
-                OnPropertyChanged();
-            }
-        }
 
         [Inject] private readonly PluginConfig _pluginConfig = null;
         [Inject] private readonly PluginManager _pluginManager = null;
@@ -94,18 +60,14 @@ namespace SaberFactory.UI.CustomSaber.Views
 
         public ENavigationCategory Category => ENavigationCategory.Settings;
 
-        private SFSaberSound _saberSound;
+        
 
         public override void DidClose()
         {
             _changelogPopup.Hide();
         }
 
-        public override void DidOpen()
-        {
-            _editorInstanceManager.CurrentSaber.GetSaberComponent(out _saberSound);
-        }
-
+       
         [UIAction("#post-parse")]
         private async void Setup()
         {

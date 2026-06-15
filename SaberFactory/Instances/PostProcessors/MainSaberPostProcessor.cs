@@ -23,10 +23,10 @@ namespace SaberFactory.Instances.PostProcessors
             gameobject.GetComponentsInChildren<AudioSource>(true).Do(x => x.volume *= _config.SaberAudioVolumeMultiplier);
             gameobject.GetComponentsInChildren<Renderer>(true).Do(x => { x.sortingOrder = 3; });
 
-            if (gameobject.GetComponentInChildren<SFSaberSound>() is { } saberSound)
-            {
-                saberSound.ConfigVolume = _config.SwingSoundVolume;
-            }
+            
+            
+               
+            
         }
     }
 }

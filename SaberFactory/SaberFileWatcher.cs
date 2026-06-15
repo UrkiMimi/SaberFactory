@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.IO;
+using System.Threading.Tasks;
+using IPA.Utilities.Async;
 using UnityEngine;
 
 namespace SaberFactory
@@ -42,7 +44,22 @@ namespace SaberFactory
 
         private void WatcherOnCreated(object sender, FileSystemEventArgs e)
         {
-            HMMainThreadDispatcher.instance.Enqueue(Initiate(e.FullPath));
+            _ = Task.Factory.StartNew(async () =>
+            {
+                var seconds = 0f;
+                while (seconds < 10)
+                {
+                    if (File.Exists(e.FullPath))
+                    {
+                        await Task.Delay(500);
+                        OnSaberUpdate?.Invoke(e.FullPath);
+                        return;
+                    }
+
+                    await Task.Delay(500);
+                    seconds += 0.5f;
+                }
+            }, System.Threading.CancellationToken.None, TaskCreationOptions.None, UnityMainThreadTaskScheduler.Default);
         }
 
         private IEnumerator Initiate(string filename)

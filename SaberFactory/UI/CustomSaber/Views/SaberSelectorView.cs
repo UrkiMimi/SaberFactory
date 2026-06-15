@@ -273,6 +273,11 @@ namespace SaberFactory.UI.CustomSaber.Views
                 await ShowSabers();
             }
 
+            if (_currentComposition == null)
+            {
+                return;
+            }
+
             _editor.FlashPedestal(new Color(0.24f, 0.77f, 1f));
         }
 

@@ -1,4 +1,6 @@
-﻿namespace SaberFactory.Configuration
+﻿using SiraUtil.Logging;
+
+namespace SaberFactory.Configuration
 {
     public class TrailConfig : ConfigBase
     {

@@ -16,15 +16,15 @@ namespace SaberFactory.UI.Lib
 
         public void Dispose()
         {
-            if (MenuButtons.IsSingletonAvailable && BSMLParser.IsSingletonAvailable)
+            if ((MenuButtons.Instance != null) && (BSMLParser.Instance != null))
             {
-                MenuButtons.instance.UnregisterButton(_menuButton);
+                MenuButtons.Instance.UnregisterButton(_menuButton);
             }
         }
 
         public void Initialize()
         {
-            MenuButtons.instance.RegisterButton(_menuButton);
+            MenuButtons.Instance.RegisterButton(_menuButton);
         }
 
         protected virtual void OnClick()

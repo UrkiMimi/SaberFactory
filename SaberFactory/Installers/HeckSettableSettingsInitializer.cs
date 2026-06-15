@@ -1,4 +1,5 @@
 using Heck.SettingsSetter;
+using UnityEngine;
 using Zenject;
 
 namespace SaberFactory.Installers
@@ -7,7 +8,7 @@ namespace SaberFactory.Installers
 
     {
         public static bool Initialized { get; private set; }
-        
+
         private const string GroupName = "_saberFactory";
 
         public SettableSetting<bool> RelativeTrailMode;
@@ -19,9 +20,9 @@ namespace SaberFactory.Installers
 
         public void Initialize()
         {
-            if (!Initialized)
+            if (Initialized)
                 return;
-            
+
             RegisterSetting(ref RelativeTrailMode, _saberSettableSettings.RelativeTrailMode, "_relativeTrailMode");
             Initialized = true;
         }
