@@ -61,8 +61,12 @@ namespace SaberFactory.Models
                 _modelLeft.StoreAsset.Unload();
                 _modelLeft.Dispose();
             }
-
-            _modelRight?.Dispose();
+            BasePieceModel modelRight = _modelRight;
+            if (modelRight == null)
+            {
+                return;
+            }
+            modelRight.Dispose();
         }
 
         public void LazyInit()
