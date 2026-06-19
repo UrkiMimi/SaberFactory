@@ -16,11 +16,6 @@
 </br>
 </br>
 
-|   |  |
-| ------------- | ------------- |
-| Mod Download  | **[Latest Version](https://github.com/Dennoo11/SaberFactory/releases)**  |
-| Website  | **[SaberFactory.com](https://saberfactory.com)**  |
-
 
 ## What is Saber Factory?
 Simply said: An all-rounder when it comes to sabers.
@@ -36,10 +31,9 @@ Change the shape, shaders, material properties, textures and more of parts and s
 2) Unpack it in your Beat Saber directory
 
 ## I want to create a saber
-`TODO: Rewrite this :sourpls:`
-
 I highly recommend watching [this tutorial](https://www.youtube.com/watch?v=YqpcNTpzW4A).  
 The unity project can be found [here](https://github.com/ToniMacaroni/AssetCreationProject)
+
 
 ## I have made a noodle map where the player moves and I want the trails to not stretch
 By default if the player moves in a noodle map the trail behaves like a real trail and becomes longer the faster the player moves.
@@ -66,27 +60,4 @@ You can enable "relative movement of the trail to the player" by using a settabl
       ]
 ```
 The settings group is `_saberFactory` and the field is `_relativeTrailMode` (which can be either `true` or `false`)
-
-
-## I made a mod that needs to create some sabers in the menu (or other place after the menu)
-`Unsure to remove this or not lol`
-
-If you want to create sabers in the menu (like [Custom Menu Pointers](https://github.com/dawnvt/CustomMenuPointers/) does)  
-you can request the `MenuSaberProvider` and create sabers with it like this:
-
-```csharp
-public class MyMenuManager : IInitializable
-{
-    private readonly MenuSaberProvider _menuSaberProvider;
-
-    public MyMenuManager(MenuSaberProvider menuSaberProvider)
-    {
-        _menuSaberProvider = menuSaberProvider;
-    }
-
-    public async void Initialize()
-    {
-        var myLeftSaber = await _menuSaberProvider.CreateSaber(parent:null, saberType:SaberType.SaberA, color:Color.red, createTrail:true);
-    }
-}
 ```
