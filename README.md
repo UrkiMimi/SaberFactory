@@ -60,4 +60,3 @@ You can enable "relative movement of the trail to the player" by using a settabl
       ]
 ```
 The settings group is `_saberFactory` and the field is `_relativeTrailMode` (which can be either `true` or `false`)
-```
